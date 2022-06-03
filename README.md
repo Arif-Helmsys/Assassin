@@ -1,1 +1,1 @@
-# Assassin-Trojan
+# Assassin
