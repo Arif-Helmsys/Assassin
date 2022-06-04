@@ -1,0 +1,5 @@
+pydater==0.5
+requests==2.26.0
+pynput==1.7.5
+folium==0.12.1.post1
+Pillow==9.1.1
