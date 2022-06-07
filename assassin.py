@@ -24,7 +24,7 @@ c$$$cc$$$c  '''    $  '''    $c$$$cc$$$c  '''    $  '''    $$$$  $$$ "Y$c$$
 \t\tgithub: https://github.com/Arif-Helmsys
 \t\t     Assassin Name: Altair
 """
-ip = ""
+ip = "192.168.1.5"
 port = 1881
 state = False
 print(f"{random.choice(Console.SHAKER)}{banner}")
@@ -107,6 +107,10 @@ class Server(socket.socket):
                     else:
                         client_socket.send(c.encode())
                         resp = client_socket.recv(18432).decode()
+                        buffer = super().getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+                        if buffer > 4096:
+                            buffer += 1024
+                            super().setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF,buffer)
                         if resp == "exited":
                             break
                         print(f"{resp}")
