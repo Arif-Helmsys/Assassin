@@ -24,8 +24,7 @@ class Console:
     HELPER = f"""\t\t\t {CYAN}╰──/{DEFAULT}{SHUTDOWN}{CYAN}    [{GREEN}Shutdown{CYAN}]
        ╰──/{DEFAULT}{CONNECT}{CYAN}     [{GREEN}Connect{CYAN}]
        ╰──/{DEFAULT}{MY_SHELL}{CYAN}  [{GREEN}My-Shell{CYAN}]
-       ╰──/{DEFAULT}{EXECUTE}{CYAN}    [{GREEN}Creating Execute{CYAN}]
-    """.expandtabs(2)
+       ╰──/{DEFAULT}{EXECUTE}{CYAN}    [{GREEN}Creating Execute{CYAN}]""".expandtabs(2)
     #----------------------CONSOLE COMMANDS-----------------#
 
     def _input_(self,string:str) -> str:
@@ -38,7 +37,7 @@ class Console:
     def loadingAnimation(self):
         load_str = "connecting "
         ls_len = len(load_str)
-        animation = " |/-\\ "
+        animation = "|/-\\"
         anicount = 0
         counttime = 0
         i = 0

