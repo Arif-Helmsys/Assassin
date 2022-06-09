@@ -24,7 +24,7 @@ c$$$cc$$$c  '''    $  '''    $c$$$cc$$$c  '''    $  '''    $$$$  $$$ "Y$c$$
 \t\tgithub: https://github.com/Arif-Helmsys
 \t\t     Assassin Name: Altair
 """
-ip = "192.168.1.5"
+ip = ""
 port = 1881
 state = False
 print(f"{random.choice(Console.SHAKER)}{banner}")
