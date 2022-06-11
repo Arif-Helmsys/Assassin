@@ -17,11 +17,10 @@ class VersionControl(PyDate):
                 if _input == "Y":
                     self.saveNewVersion(False)
                     self.scriptUpdate()
-                    print(f"\t{Console.CYAN}╰──/UPDATED!".expandtabs(7))
-                    os.execl(sys.executable, sys.executable, *sys.argv)
-                elif _input == "n":
-                    print(f"\t{Console.CYAN}╰──/Please Updated".expandtabs(7))
+                    print(f"\t{Console.CYAN}╰──/UPDATED!{Console.DEFAULT}".expandtabs(7))
                     sys.exit(0)
+                elif _input == "n":
+                    print(f"\t{Console.CYAN}╰──/Please Updated{Console.DEFAULT}".expandtabs(7))
     
     def scriptUpdate(self) -> bool:
         script__raw_link = "https://raw.githubusercontent.com/Arif-Helmsys/Assassin/main/assassin.py"
