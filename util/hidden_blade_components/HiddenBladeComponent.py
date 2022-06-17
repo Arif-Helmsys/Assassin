@@ -64,14 +64,8 @@ class ClientCommands:
                 else:
                     return os.popen(f"taskkill /im {splitter_kill[0]} /f").read()
             else:
-                if c == "help":
-                    HELPER = f"""\t{Console.CYAN}╰──/{Console.DEFAULT}get-apps{Console.CYAN:<11} [{Console.GREEN}GET-ALL-APP-NAME{Console.CYAN}]
-\t╰──/{Console.DEFAULT}kill{Console.CYAN:<15} [{Console.GREEN}CLOSE-APP{Console.CYAN}]
-\t╰──/{Console.DEFAULT}get-wifi-passw{Console.CYAN} [{Console.GREEN}GET-SAVED-WIFI-PASSWORDS{Console.CYAN}]
-\t╰──/{Console.DEFAULT}e--{Console.CYAN:<16} [{Console.GREEN}EXIT-SHELL{Console.CYAN}]""".expandtabs(14)
-                    return HELPER
-                elif c == "get-apps":
-                    return "\n".join(f"\t\t{Console.CYAN}╰──/{Console.DEFAULT}{p.name()}".expandtabs(7) for p in psutil.process_iter())
+                if c == "get-apps":
+                    return "\n".join(set([p.name() for p in psutil.process_iter()]))
                 elif c == "get-wifi-passw":
                     return self.wifiChecked()
                 elif c == "e--":

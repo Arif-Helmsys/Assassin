@@ -29,7 +29,7 @@ class Console:
 
     def _input_(self,string:str) -> str:
         for char in string:
-            sleep(0.001)
+            sleep(0.01)
             sys.stdout.write(char)
             sys.stdout.flush()
         return input()
@@ -41,7 +41,7 @@ class Console:
         anicount = 0
         counttime = 0
         i = 0
-        r = random.randint(20,60)
+        r = random.randint(20,30)
         while (counttime != r):
             sleep(0.075) 
             load_str_list = list(load_str)   
