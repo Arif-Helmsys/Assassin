@@ -1,5 +1,4 @@
 from getpass import getuser
-from http import client
 from time import sleep
 from util import versionControl,Console,AltairCommandList
 import os
