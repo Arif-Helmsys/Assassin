@@ -29,7 +29,6 @@ class Console:
 
     def _input_(self,string:str) -> str:
         for char in string:
-            sleep(0.01)
             sys.stdout.write(char)
             sys.stdout.flush()
         return input()

