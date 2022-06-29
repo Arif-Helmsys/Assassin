@@ -1,5 +1,4 @@
 import sys
-from time import sleep
 import requests
 import platform
 import socket
@@ -9,6 +8,7 @@ import psutil
 import win32api
 import pyautogui
 import win32con
+from time import sleep
 from pynput.keyboard import Key, Listener
 from getpass import getuser
 from util import Console
