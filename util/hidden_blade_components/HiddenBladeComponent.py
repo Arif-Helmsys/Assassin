@@ -7,10 +7,7 @@ import os
 import subprocess
 import psutil
 import win32api
-import rotatescreen
 import pyautogui
-import cv2
-import numpy as np
 import win32con
 from pynput.keyboard import Key, Listener
 from getpass import getuser
